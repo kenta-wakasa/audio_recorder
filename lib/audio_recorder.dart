@@ -11,8 +11,10 @@ class AudioRecorder {
   /// use [LocalFileSystem] to permit widget testing
   static LocalFileSystem fs = LocalFileSystem();
 
-  static Future start(
-      {String path, AudioOutputFormat audioOutputFormat}) async {
+  static Future start({
+    String? path,
+    AudioOutputFormat? audioOutputFormat,
+  }) async {
     String extension;
     if (path != null) {
       if (audioOutputFormat != null) {
@@ -47,12 +49,13 @@ class AudioRecorder {
   static Future<Recording> stop() async {
     Map<String, Object> response =
         Map.from(await _channel.invokeMethod('stop'));
-    Recording recording = new Recording(
-        duration: new Duration(milliseconds: response['duration']),
-        path: response['path'],
-        audioOutputFormat:
-            _convertStringInAudioOutputFormat(response['audioOutputFormat']),
-        extension: response['audioOutputFormat']);
+    final recording = Recording(
+      duration: Duration(milliseconds: (response['duration'] as num).toInt()),
+      path: response['path'] as String,
+      audioOutputFormat: _convertStringInAudioOutputFormat(
+          response['audioOutputFormat'] as String),
+      extension: response['audioOutputFormat'] as String,
+    );
     return recording;
   }
 
@@ -66,7 +69,8 @@ class AudioRecorder {
     return hasPermission;
   }
 
-  static AudioOutputFormat _convertStringInAudioOutputFormat(String extension) {
+  static AudioOutputFormat? _convertStringInAudioOutputFormat(
+      String extension) {
     switch (extension) {
       case ".wav":
         return AudioOutputFormat.WAV;
@@ -114,7 +118,12 @@ class Recording {
   // Audio duration in milliseconds
   Duration duration;
   // Audio output format
-  AudioOutputFormat audioOutputFormat;
+  AudioOutputFormat? audioOutputFormat;
 
-  Recording({this.duration, this.path, this.audioOutputFormat, this.extension});
+  Recording({
+    required this.path,
+    required this.duration,
+    required this.extension,
+    this.audioOutputFormat,
+  });
 }

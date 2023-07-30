@@ -10,9 +10,9 @@ void main() {
   final extension = '.m4a';
   final duration = 1000;
   Directory tempDirectory;
-  String path;
+  late String path;
   bool isRecording = false;
-  File file;
+  File? file;
 
   setUpAll(() async {
     tempDirectory = await Directory.systemTemp.createTemp();
@@ -44,7 +44,7 @@ void main() {
 
   tearDown(() async {
     log.clear();
-    if (file != null && await file.exists()) await file.delete();
+    if (file != null && await file!.exists()) await file?.delete();
   });
 
   test('should start audio recorder', () async {
@@ -121,7 +121,7 @@ void main() {
   test('should throw when starting audio recorder with existing file',
       () async {
     file = File(path + extension);
-    await file.writeAsString('audio content', flush: true);
+    await file?.writeAsString('audio content', flush: true);
     final startAudioRecorder = () async {
       await AudioRecorder.start(
         path: path,
